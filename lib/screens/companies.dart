@@ -1,27 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:iinfinitecheck/models/Company.dart';
 
 import '../utils/customcolors.dart';
 
 class CompaniesPage extends StatelessWidget {
-  final List<String> airlineCompanies = [
-    "ATR",
-    "Aero Vodochody",
-    "Aeroprakt",
-    "Airbus",
-    "Aviat",
-    "BAe",
-    "Beechcraft",
-    "Boeing",
-    "Bombardier",
-    "Cessna",
-    "Cirrus",
-    "Diamond",
-    "Embraer",
-    "Mooney",
-    "Pilatus",
-    "Vans",
-    ""
-  ];
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +16,17 @@ class CompaniesPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: ListView.builder(
-        itemCount: airlineCompanies.length,
+        itemCount: companylist.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(airlineCompanies[index]),
+            title: Text(companylist[index].name),
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {
               // Navigate to the company details screen when a company is tapped
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CompanyDetailScreen(companyName: airlineCompanies[index]),
+                  builder: (context) => CompanyDetailScreen(id: companylist[index].id,companyName: companylist[index].name),
                 ),
               );
             },
@@ -56,8 +39,15 @@ class CompaniesPage extends StatelessWidget {
 
 class CompanyDetailScreen extends StatelessWidget {
   final String companyName;
+  final int id;
 
-  CompanyDetailScreen({required this.companyName});
+  List<CompanyModel> modellist=[];
+
+  CompanyDetailScreen({required this.id,required this.companyName});
+
+  fetchData(){
+    modellist=companyModelList.where((element) => element.company_id==id).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,48 +72,29 @@ class CompanyDetailScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView(
-              children: [
-                ListTile(
-                  title: Text('ATR 42-500(Demo)'),
-                  trailing: Icon(Icons.keyboard_arrow_right),
-                  onTap: () {
-                    // Navigate to the detail page for ATR 42-500(Demo)
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailPage(companyName: companyName, modelName: 'ATR 42-500(Demo)'),
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  title: Text('ART 72'),
-                  trailing: Icon(Icons.keyboard_arrow_right),
-                  onTap: () {
-                    // Navigate to the detail page for ART 72
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailPage(companyName: companyName, modelName: 'ART 72'),
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  title: Text('ATR 72-500'),
-                  trailing: Icon(Icons.keyboard_arrow_right),
-                  onTap: () {
-                    // Navigate to the detail page for ATR 72-500
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailPage(companyName: companyName, modelName: 'ATR 72-500'),
-                      ),
-                    );
-                  },
-                ),
-              ],
+            child: StreamBuilder<Object>(
+              stream: fetchData(),
+              builder: (context, snapshot) {
+                return ListView(
+                  children: [
+                    for(int i=0;i<modellist.length;i++)
+                      ListTile(
+                      title: Text(modellist[i].modelName),
+                      trailing: Icon(Icons.keyboard_arrow_right),
+                      onTap: () {
+                        // Navigate to the detail page for ATR 42-500(Demo)
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailPage(id: modellist[i].id,companyName: companyName, modelName: modellist[i].modelName),
+                          ),
+                        );
+                      },
+                    ),
+                   
+                  ],
+                );
+              }
             ),
           ),
         ],
@@ -135,9 +106,15 @@ class CompanyDetailScreen extends StatelessWidget {
 class DetailPage extends StatelessWidget {
   final String companyName;
   final String modelName;
+  final int id;
 
-  DetailPage({required this.companyName, required this.modelName});
+  List<ModelSpec> speclist=[];
 
+  DetailPage({required this.id,required this.companyName, required this.modelName});
+
+  fetchData(){
+    speclist=modelSpecList.where((element) => element.model_id==id).toList();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,9 +124,97 @@ class DetailPage extends StatelessWidget {
         title: Text('$companyName - $modelName'),
         centerTitle: true,
       ),
-      body: Center(
-        child: Text('Details for $companyName - $modelName'),
+      body: StreamBuilder<Object>(
+              stream: fetchData(),
+              builder: (context, snapshot) {
+                return ListView(
+                  children: [
+                    for(int i=0;i<speclist.length;i++)
+                      ListTile(
+                      title: Text(speclist[i].specName),
+                      trailing: Icon(Icons.keyboard_arrow_right),
+                      onTap: () {
+                        // Navigate to the detail page for ATR 42-500(Demo)
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FunctionPage(id: speclist[i].id, specName: speclist[i].specName),
+                          ),
+                        );
+                      },
+                    ),
+                   
+                  ],
+                );
+              }
+            ),
+    );
+  }
+}
+
+
+
+
+class FunctionPage extends StatefulWidget {
+  final String specName;
+  final int id;
+
+
+  FunctionPage({required this.id,required this.specName});
+
+  @override
+  State<FunctionPage> createState() => _FunctionPageState();
+}
+
+class _FunctionPageState extends State<FunctionPage> {
+  List<SpecFunction> functionList=[];
+
+  List<bool> checklist=[];
+
+  fetchData(){
+    functionList=specFunctionList.where((element) => element.spec_id==widget.id).toList();
+    for(int i=0;i<functionList.length;i++){
+      checklist.add(false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: CustomColors.backgrounds,
+      appBar: AppBar(
+        backgroundColor: CustomColors.header,
+        title: Text(widget.specName),
+        centerTitle: true,
       ),
+      body: StreamBuilder<Object>(
+              stream: fetchData(),
+              builder: (context, snapshot) {
+                return ListView(
+                  children: [
+                    for(int i=0;i<functionList.length;i++)
+                      ListTile(
+                      title: Row(
+                        children: [
+                          Container(width: 50,color: checklist[i]?Colors.green:Colors.red,),
+                          Text(functionList[i].funName,style: TextStyle(color: checklist[i]?Colors.green:Colors.red,),),
+                        ],
+                      ),
+                      trailing: Text(functionList[i].value),
+                      onTap: () {
+                        // Navigate to the detail page for ATR 42-500(Demo)
+                        checklist[i]=!checklist[i];
+                        setState(() {
+                          
+                        });
+                       
+                      },
+                    ),
+                   
+                  ],
+                );
+              }
+            ),
     );
   }
 }
