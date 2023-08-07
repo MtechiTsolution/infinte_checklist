@@ -32,7 +32,7 @@ class _SplashPageState extends State<SplashPage> {
     Future.delayed(Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => AnimatedBarExample()),
+        MaterialPageRoute(builder: (context) => BottomNavigationBarExample()),
       );
     });
   }

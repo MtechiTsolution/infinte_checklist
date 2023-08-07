@@ -94,3 +94,69 @@ class _AnimatedBarExampleState extends State<AnimatedBarExample> {
   }
 }
 
+
+
+
+
+class BottomNavigationBarExample extends StatefulWidget {
+  const BottomNavigationBarExample({super.key});
+
+  @override
+  State<BottomNavigationBarExample> createState() =>
+      _BottomNavigationBarExampleState();
+}
+
+class _BottomNavigationBarExampleState
+    extends State<BottomNavigationBarExample> {
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static  List<Widget> _widgetOptions = <Widget> [
+  Basic(),
+            CompaniesPage(),
+            Advance(),
+            SettingsPage()
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBody: false,
+      backgroundColor: CustomColors.header,
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: CustomColors.header,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.house_rounded),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star_rounded),
+            label: 'BASIC',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.playlist_add_check),
+            label: 'ADVANCE',
+          ),
+           BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'SETTING',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        showUnselectedLabels: true,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
